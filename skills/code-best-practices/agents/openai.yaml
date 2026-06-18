@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Best Practices"
+  short_description: "Apply requested coding best practices"
+  default_prompt: "Use $code-best-practices while making this code change."
