@@ -8,14 +8,14 @@ Apply these rules to all coding tasks unless higher-priority project or user ins
 - Understand the project's goal and affected workflow before changing code so the result fits the intended behavior.
 - Follow the project's existing style, formatting, APIs, idioms, and helpers unless doing so would hurt correctness, performance, or code quality.
 - Preserve public APIs, data formats, migrations, and user-facing behavior unless the request requires changing them.
-- Keep changes scoped to the user's request. Avoid unrelated formatting churn, broad rewrites, and opportunistic refactors.
+- Keep changes scoped to the user's request: avoid unrelated formatting churn, broad rewrites, and opportunistic refactors. Scope limits *unrelated* work; it does not mean preferring the smallest diff. A correct fix may need to touch several places on the same code path, and that is in scope.
 
 ## Keep Code Clean
 
 - Write concise, readable, maintainable code that is easy to change later.
 - Prefer clear, boring solutions over "clever", hacky, brittle, lazy, or surface-level fixes.
   - there are *some* cases where you may have no choice but to use a clever solution, but you should always consider whether a simpler solution is possible first.
-- Use the simplest solution that fits the current requirements and project design. Do not add complexity where it is not needed.
+- Use the simplest solution that fully and correctly handles the realistic cases on the affected path, then stop. Simplicity means avoiding needless complexity. Do not trade correctness or completeness for a smaller diff.
 - If applicable, a restructure that improves maintainability or performance is fine when you are very confident it will not change behavior or introduce side effects (and if your change is related to the core problem you're solving).
 - Do not add unnecessary ceremony, wrappers, variables, branches, types, indirection, or tiny one-off helpers unless they improve readability or isolate tricky logic.
 - Keep simple control flow compact when the project style allows it, but do not compress complex logic or side effects just to make code shorter.
@@ -33,7 +33,8 @@ Apply these rules to all coding tasks unless higher-priority project or user ins
 ## Correctness
 
 - Think through realistic edge cases and side effects while implementing.
-- When fixing a bug, assume it may be deeper than the first visible symptom; identify the root cause and affected paths before patching the provided example.
+- When fixing a bug, assume it may be deeper than the first visible symptom. Identify the root cause and every failure mode it produces on the affected paths, then fix the whole class, not just the specific input or symptom that was reported.
+- Be wary of the smallest change that makes the reported symptom disappear: it may leave sibling cases on the same path broken (other inputs, boundary or empty or first-run states, or a prerequisite that may not exist). Confirm those are handled before settling on a fix.
 - Handle cases that can occur in the actual code path. Do not add defensive branches for cases that upstream types, validation, or invariants already make impossible.
 - Keep side effects intentional, scoped, and visible at the right boundary.
 - Validate untrusted input at boundaries and fail with actionable errors.
@@ -76,3 +77,4 @@ Apply these rules to all coding tasks unless higher-priority project or user ins
 
 - Inspect the diff before finishing.
 - Confirm the change answers the user's newest request.
+- For a bug fix, confirm it resolves the root cause across all realistic conditions on the affected path, not only the reported example.
